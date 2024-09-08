@@ -77,9 +77,9 @@ exports.setUserIdQuery = (req, res, next) => {
 };
 
 const createBookingAtCheckout = async (session) => {
-  console.log(session.client_reference_id);
-  console.log(session.customer_details);
-  console.log(session.amount_total);
+  // console.log(session.client_reference_id);
+  // console.log(session.customer_details);
+  // console.log(session.amount_total);
 
   const tourId = session.client_reference_id;
   const userId = (await User.findOne({ email: session.customer_details.email }))
