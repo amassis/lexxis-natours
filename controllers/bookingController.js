@@ -75,12 +75,15 @@ exports.setUserIdQuery = (req, res, next) => {
 };
 
 const createBookingAtCheckout = async (session) => {
+  console.log(session.client_reference_id);
+  console.log(session.customer_details);
+  console.log(session.amount_total);
+
   const tourId = session.client_reference_id;
-  const userId = (await User.findOne({ email: session.customer_email })).id;
-  const price =
-    (session.line_items[0].price_data.unit_amount *
-      session.line_items[0].quantity) /
-    100;
+  const userId = (await User.findOne({ email: session.customer_details.email }))
+    .id;
+  const price = session.amount_total / 100;
+  console.log(tourId, userId, price);
   await Booking.create({ tour: tourId, user: userId, price });
 };
 
