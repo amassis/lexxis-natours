@@ -15,7 +15,7 @@ export const updateSettings = async (data, type = 'settings') => {
 
   const options = {
     method: 'PATCH',
-    url: `http://localhost:3000/${api}`,
+    url: `/${api}`,
     data: data,
   };
 
@@ -27,10 +27,8 @@ export const updateSettings = async (data, type = 'settings') => {
         location.assign('/me');
       }, 1500);
     }
-    console.log('Here is response');
-    console.log(res);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     showAlert('error', err.response.data.message);
   }
 };

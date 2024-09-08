@@ -12,7 +12,7 @@ export const loginSignup = async (data) => {
 
   const options = {
     method: 'POST',
-    url: `http://localhost:3000/api/v1/auth/${operation}`,
+    url: `/api/v1/auth/${operation}`,
     data: data,
   };
 
@@ -37,7 +37,7 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: 'http://localhost:3000/api/v1/auth/logout',
+      url: '/api/v1/auth/logout',
     });
     if (res.data.status === 'success') {
       showAlert('success', 'Logged out successfully');

@@ -17,9 +17,9 @@ exports.setTourUserIdsQuery = (req, res, next) => {
   if (req.params.userId) {
     filter.user = req.params.userId;
   }
-  console.log(req.query);
+  // console.log(req.query);
   req.query = { ...req.query, ...filter };
-  console.log(req.query);
+  // console.log(req.query);
   next();
 };
 

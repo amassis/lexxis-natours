@@ -47,7 +47,6 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
       req.body.images.push(filename);
     }),
   );
-  console.log(req.body);
   next();
 });
 //middleware to filter top-5-cheap
@@ -150,7 +149,7 @@ exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
-  console.log(distance, latlng, unit);
+
   const [lat, lng] = latlng.split(',');
 
   // radius in radians (= distance/radius of Earth)

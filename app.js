@@ -7,7 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize'); // security - prevent M
 const xss = require('xss-clean'); // security - against cross site scripting; DEPRECATED - use helmet instead
 const hpp = require('hpp'); // stability - http parameter polution (repeated parameters are returned as arrays, breaking up code)
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names
-
+const compression = require('compression'); // Compresses all texts sent to client
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -103,6 +103,8 @@ app.use(
     ],
   }),
 );
+
+app.use(compression());
 
 // Test Middleware
 app.use((req, res, next) => {

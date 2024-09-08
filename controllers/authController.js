@@ -51,7 +51,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
   await new Email(newUser, url).sendWelcome();
 
   createSendToken(201, newUser, res);
@@ -184,15 +183,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) get user
-  console.log('Update Password');
   const user = await User.findById(req.user.id).select('+password');
 
-  console.log('User');
-  console.log(user);
-
   const { pwdCurrent, password, pwdConfirm } = req.body;
-  console.log('Body');
-  console.log(req.body);
 
   if (!pwdCurrent) {
     return next(new AppError('Please provide your current password.', 400));
@@ -251,9 +244,8 @@ exports.isLoggedIn = async (req, res, next) => {
     }
     return next();
   } catch (err) {
-    if (req.cookies.jwt === 'loggedout')
-      console.log('Logged Out'); // Malformed cookie error is expected, so, don't show error message in console
-    else console.error(err); // Unlikely - this is some other error, so, show error message in console
+    if (req.cookies.jwt !== 'loggedout') console.error(err);
+    // Unlikely - this is some other error, so, show error message in console. Malformed cookie is already to be expected with 'loggedout' so, ignore it.
     return next();
   }
 };

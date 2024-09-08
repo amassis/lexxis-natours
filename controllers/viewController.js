@@ -40,7 +40,7 @@ exports.getAccountForm = (req, res) => {
 };
 
 exports.passwordReset = (req, res, next) => {
-  console.log(req.params.token);
+  // console.log(req.params.token);
   res.status(200).render('resetPassword', {
     title: 'Reset your Password',
     token: req.params.token,
@@ -48,7 +48,7 @@ exports.passwordReset = (req, res, next) => {
 };
 
 exports.getMyTours = catchAsync(async (req, res, next) => {
-  console.log(req.user);
+  // console.log(req.user);
   const bookings = await Booking.find({ user: req.user.id });
 
   if (!bookings || bookings.length < 1)
@@ -56,7 +56,6 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
 
   const myToursIds = bookings.map((bk) => bk.tour);
   const myTours = await Tour.find({ _id: { $in: myToursIds } });
-  console.log(myTours);
 
   res.status(200).render('overview', {
     title: `My Bookings`,
