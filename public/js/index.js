@@ -4,6 +4,7 @@ import { readUserForm, clearPasswordFields } from './readUserForm';
 import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { bookTour } from './stripe';
+import { showAlert } from './alerts';
 
 // DOM Elements
 const mapboxElement = document.getElementById('map');
@@ -79,3 +80,6 @@ if (bookTourBtnElement) {
     await bookTour(tourId);
   });
 }
+
+const alertMessage = document.querySelector('body').dataset.alert;
+if (alertMessage) showAlert('success', alertMessage, 10);

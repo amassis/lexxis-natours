@@ -1,10 +1,10 @@
 /* eslint-disable */
-export const showAlert = (type, msg) => {
+export const showAlert = (type, msg, duration = 5) => {
   // type is error or success
   hideAlert();
   const markup = `<div class="alert alert--${type}">${msg}</div>`;
   document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-  window.setTimeout(hideAlert, 5000);
+  window.setTimeout(hideAlert, 1000 * duration);
 };
 
 export const hideAlert = () => {
