@@ -8,6 +8,7 @@ const xss = require('xss-clean'); // security - against cross site scripting; DE
 const hpp = require('hpp'); // stability - http parameter polution (repeated parameters are returned as arrays, breaking up code)
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names
 const compression = require('compression'); // Compresses all texts sent to client
+const cors = require('cors'); // Cross Origin Resource Sharing - allow SPI calls from other domains
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -25,6 +26,13 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) Global Middleware
+// Implement CORS
+app.use(cors());
+//Access-Control-Allow-Origin: *
+
+//allow non-simple requests (PUT, PATCH, DELETE, Cookies, Nonstandard headers => need preflight phase)
+app.options('*', cors());
+
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
