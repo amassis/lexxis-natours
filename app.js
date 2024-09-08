@@ -18,6 +18,9 @@ const authRouter = require('./routes/authRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
+// tells app to trust proxies (Heroku works as proxy)
+app.enable('trust proxy');
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
