@@ -4,6 +4,7 @@ const Booking = require('../models/bookingModel');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const User = require('../models/userModel');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   if (!req.params.tourId)
@@ -20,7 +21,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     mode: 'payment',
-    success_url: `${req.protocol}://${req.get('host')}/?tourId=${tour.id}&userId=${req.user.id}&price=${tour.price}`,
+    // success_url: `${req.protocol}://${req.get('host')}/?tourId=${tour.id}&userId=${req.user.id}&price=${tour.price}`,
+    success_url: `${req.protocol}://${req.get('host')}/myTours`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -45,15 +47,15 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createBookingAtCheckout = catchAsync(async (req, res, next) => {
-  // TEMPORARY SOLUTION
-  const { tourId, userId, price } = req.query;
-  if (!tourId || !userId || !price) return next();
+// exports.createBookingAtCheckout = catchAsync(async (req, res, next) => {
+//   // TEMPORARY SOLUTION
+//   const { tourId, userId, price } = req.query;
+//   if (!tourId || !userId || !price) return next();
 
-  await Booking.create({ tour: tourId, user: userId, price });
+//   await Booking.create({ tour: tourId, user: userId, price });
 
-  res.redirect(req.originalUrl.split('?')[0]);
-});
+//   res.redirect(req.originalUrl.split('?')[0]);
+// });
 
 // Middleware for the "Me" Routes.
 exports.setMyId = (req, res, next) => {
@@ -72,6 +74,34 @@ exports.setUserIdQuery = (req, res, next) => {
   next();
 };
 
+const createBookingAtCheckout = async (session) => {
+  const tourId = session.client_reference_id;
+  const userId = (await User.findOne({ email: session.customer_email })).id;
+  const price =
+    (session.line_items[0].price_data.unit_amount *
+      session.line_items[0].quantity) /
+    100;
+  await Booking.create({ tour: tourId, user: userId, price });
+};
+
+exports.webhookCheckout = (req, res, next) => {
+  const signature = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    );
+  } catch (err) {
+    console.error(err);
+    return res.status(400).send(`Webhook error: ${err.message}`);
+  }
+  if (event.type === 'checkout.session.completed')
+    createBookingAtCheckout(event.data.object);
+
+  res.status(200).json({ received: true });
+};
 exports.getAllBookings = factory.getAll(Booking);
 exports.getBooking = factory.getOne(Booking);
 exports.createBooking = factory.createOne(Booking);

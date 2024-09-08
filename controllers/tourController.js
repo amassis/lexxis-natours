@@ -149,7 +149,6 @@ exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
-
   const [lat, lng] = latlng.split(',');
 
   // radius in radians (= distance/radius of Earth)
