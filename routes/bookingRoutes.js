@@ -12,7 +12,7 @@ router.get('/checkout-session/:tourId', bookingController.getCheckoutSession);
 router.get(
   '/myBookings',
   bookingController.setMyId,
-  bookingController.setUserIdQuery,
+  bookingController.setTourUserIdsQuery,
   bookingController.getAllBookings,
 );
 
@@ -20,7 +20,7 @@ router.use(authController.restrictTo('admin', 'lead-guide'));
 
 router
   .route('/')
-  .get(bookingController.getAllBookings)
+  .get(bookingController.setTourUserIdsQuery, bookingController.getAllBookings)
   .post(bookingController.createBooking);
 
 router

@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan'); // http request logger
 const rateLimit = require('express-rate-limit'); // security - limit repeated requests to public APIs and/or endpoints
 const helmet = require('helmet'); // security - sets HTTP response headers
+const crypto = require('crypto'); // criptography
 const mongoSanitize = require('express-mongo-sanitize'); // security - prevent MongoDB Operator Injection
 const xss = require('xss-clean'); // security - against cross site scripting; DEPRECATED - use helmet instead
 const hpp = require('hpp'); // stability - http parameter polution (repeated parameters are returned as arrays, breaking up code)
@@ -21,7 +22,7 @@ const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 // tells app to trust proxies (Heroku works as proxy)
-app.enable('trust proxy');
+if (process.env.NODE_ENV === 'production') app.enable('trust proxy');
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -38,6 +39,11 @@ app.options('*', cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Security Headers
+app.use((req, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(32).toString('hex');
+  next();
+});
+
 app.use(
   helmet({
     contentSecurityPolicy: {

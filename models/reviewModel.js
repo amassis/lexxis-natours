@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Tour = require('./tourModel');
+const Booking = require('./bookingModel');
+const AppError = require('../utils/appError');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -43,6 +45,18 @@ const reviewSchema = new mongoose.Schema(
 );
 
 reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
+reviewSchema.pre('save', async function (next) {
+  const booking = await Booking.findOne({ tour: this.tour, user: this.user });
+  if (!booking)
+    return next(
+      new AppError(
+        'You cannot review a tour you have not previously booked.',
+        400,
+      ),
+    );
+  next();
+});
 
 reviewSchema.pre(/^find/, function (next) {
   // Populate related objects

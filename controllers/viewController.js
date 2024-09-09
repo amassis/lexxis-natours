@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
+const Review = require('../models/reviewModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -20,9 +21,29 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
   if (!tour) return next(new AppError('There is no tour with that name', 404));
 
+  //If logged in, get user id and check for booking
+  let hasBooking = false;
+  let hasReview = false;
+
+  if (res.locals.user) {
+    const booking = await Booking.findOne({
+      tour: tour.id,
+      user: res.locals.user.id,
+    });
+
+    const review = await Review.findOne({
+      tour: tour.id,
+      user: res.locals.user.id,
+    });
+    if (booking) hasBooking = true;
+    if (review) hasReview = true;
+  }
+
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour: tour,
+    hasBooking,
+    hasReview,
   });
 });
 

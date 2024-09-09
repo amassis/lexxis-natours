@@ -65,8 +65,11 @@ exports.setMyId = (req, res, next) => {
   next();
 };
 
-exports.setUserIdQuery = (req, res, next) => {
+exports.setTourUserIdsQuery = (req, res, next) => {
   const filter = {};
+  if (req.params.tourId) {
+    filter.tour = req.params.tourId;
+  }
   if (req.params.userId) {
     filter.user = req.params.userId;
   }
@@ -85,7 +88,7 @@ const createBookingAtCheckout = async (session) => {
   const userId = (await User.findOne({ email: session.customer_details.email }))
     .id;
   const price = session.amount_total / 100;
-  console.log(tourId, userId, price);
+
   await Booking.create({ tour: tourId, user: userId, price });
 };
 
