@@ -42,6 +42,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour: tour,
+    myReviews: false,
     hasBooking,
     hasReview,
   });
@@ -81,6 +82,22 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
   res.status(200).render('overview', {
     title: `My Bookings`,
     tours: myTours,
+  });
+});
+
+exports.getMyReviews = catchAsync(async (req, res, next) => {
+  // console.log(req.user);
+  const reviews = await Review.find({ user: req.user.id }).populate('tour');
+
+  if (!reviews || reviews.length < 1)
+    return next(new AppError("You don't have any reviews", 404));
+
+  // console.log(reviews);
+
+  res.status(200).render('myreviews', {
+    title: `My Reviews`,
+    reviews: reviews,
+    myReviews: true,
   });
 });
 

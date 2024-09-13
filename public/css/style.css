@@ -277,6 +277,28 @@ body {
   background-color: #7dd56f;
 }
 
+.btn-tiny,
+.btn-tiny:link,
+.btn-tiny:visited {
+  background-color: #55c57a;
+  color: #fff;
+  font-size: 1.2rem;
+  padding: 0.8rem 0.8rem;
+  border-radius: 2rem;
+  text-transform: uppercase;
+  position: relative;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 200;
+  border: none;
+}
+
+.btn-tiny:hover {
+  background-color: #7dd56f;
+}
+
 .btn-text:link,
 .btn-text:visited {
   color: #55c57a;

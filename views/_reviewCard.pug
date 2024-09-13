@@ -3,8 +3,26 @@ mixin reviewCard(review)
     .reviews__avatar
       img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.fullName}`)
       h6.reviews__user= review.user.fullName
+    if (myReviews)
+      button.btn-tiny(data-tour-id=`${review.tour._id}`,data-review-id=`${review._id}`,data-rating-value=`${review.rating}`)= `📝 ${review.tour.name}`
     p.reviews__text= review.review
     .reviews__rating
       each star in [1,2,3,4,5]
         svg.reviews__star(class=`reviews__star--${review.rating >= star? 'active':'inactive'}`)
           use(xlink:href='/img/icons.svg#icon-star')
+    if (myReviews)
+      .modal(id=`review-modal-${review._id }`)
+        .modal-content
+          .review-form
+            h2.heading-secondary.ma-bt-sm= `Review ${review.tour.name} Tour`
+            form#review-form.form(action="#")
+              .review-form__group
+                label.form__label(for=`review-modal-review-${review._id}`) Tell us about your experience
+                textarea.form__input.reviews__text(id=`review-modal-review-${review._id}`, name="review-modal-review", cols=50, rows=5, type='text', value=`${review.review}`)= `${review.review}`
+                //- input#review-modal-review.form__input.reviews__text(type='text', placeholder='How was the tour?')
+              .review-form__group
+                label.form__label(for=`review-modal-rating-${review._id}`) Rating
+                input.rating(id=`review-modal-rating-${review._id}`, type="range", min="1", max="5", step="0.5", value=review.rating)
+              .review-form__btn
+                button.btn.btn--green.submit(id=`review-modal--submit-${review._id}`, data-tour-id=`${review.tour._id}`,data-review-id=`${review._id}`) Ok
+                //- button.btn.btn--gray.close(id='review-modal--cancel') Cancel

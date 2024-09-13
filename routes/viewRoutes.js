@@ -19,4 +19,5 @@ router.get('/signup', authController.isLoggedIn, viewController.getSignupForm);
 router.get('/me', authController.protect, viewController.getAccountForm);
 router.get('/passwordReset/:token', viewController.passwordReset);
 router.get('/myTours', authController.protect, viewController.getMyTours);
+router.get('/myReviews', authController.protect, viewController.getMyReviews);
 module.exports = router;

@@ -25,3 +25,27 @@ export const createReview = async (data) => {
     showAlert('error', err.response.data.message);
   }
 };
+
+export const updateReview = async (data) => {
+  const api = `api/v1/reviews/${data.id}`;
+  const message = 'Review updated successfully';
+
+  const options = {
+    method: 'PATCH',
+    url: `/${api}`,
+    data: data,
+  };
+
+  try {
+    const res = await axios(options);
+    if (res.data.status === 'success') {
+      showAlert('success', message);
+      window.setTimeout(() => {
+        location.reload();
+      }, 800);
+    }
+  } catch (err) {
+    console.error(err);
+    showAlert('error', err.response.data.message);
+  }
+};

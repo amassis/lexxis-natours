@@ -5,7 +5,7 @@ import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
-import { createReview } from './createReview';
+import { createReview, updateReview } from './createReview';
 
 // DOM Elements
 const mapboxElement = document.getElementById('map');
@@ -16,13 +16,11 @@ const savePasswordBtnElement = document.getElementById('savepassword');
 const resetpasswordBtnElement = document.getElementById('resetpassword');
 const bookTourBtnElement = document.getElementById('book-tour');
 const reviewTourBtnElement = document.getElementById('review-tour');
-const reviewModalElement = document.getElementById('review-modal');
-const reviewModalReviewElement = document.getElementById('review-modal-review');
-const reviewModalRatingElement = document.getElementById('review-modal-rating');
-// const reviewModalCloseBtnElement = document.getElementById(
-//   'review-modal--cancel',
-// );
-const reviewModalSubmitBtnElement = document.getElementById(
+const reviewTourBtnAllElement = document.querySelectorAll('.btn-tiny');
+let reviewModalElement = document.getElementById('review-modal');
+let reviewModalReviewElement = document.getElementById('review-modal-review');
+let reviewModalRatingElement = document.getElementById('review-modal-rating');
+let reviewModalSubmitBtnElement = document.getElementById(
   'review-modal--submit',
 );
 
@@ -92,29 +90,16 @@ if (bookTourBtnElement) {
   });
 }
 
-// If page has a Review Tour Button, add listener to click
+// If page has a Review Tour Button, add corresponding listeners
 if (reviewTourBtnElement) {
   reviewTourBtnElement.addEventListener('click', async (e) => {
     e.preventDefault();
     const { tourId } = e.target.dataset;
-    console.log('Tour RVW');
-    console.log(tourId);
+    // console.log('Tour RVW');
+    // console.log(tourId);
     reviewModalElement.dataset.tour = tourId;
     reviewModalElement.style.display = 'block';
   });
-
-  // reviewModalCloseBtnElement.addEventListener('click', () => {
-  //   reviewModalElement.style.display = 'none';
-  //   location.reload();
-  // });
-
-  // reviewModalReviewElement.addEventListener('change', function () {
-  //   if (this.value.length >= 20) {
-  //     reviewModalSubmitBtnElement.classList.remove('btn--white');
-  //     reviewModalSubmitBtnElement.classList.add('btn--green');
-  //     reviewModalSubmitBtnElement.removeAttribute('disabled');
-  //   }
-  // });
 
   reviewModalSubmitBtnElement.addEventListener('click', (e) => {
     e.preventDefault();
@@ -134,11 +119,102 @@ if (reviewTourBtnElement) {
   });
 
   window.onclick = (event) => {
+    console.log(event.target);
     if (event.target === reviewModalElement) {
       reviewModalElement.style.display = 'none';
     }
   };
 }
 
+// If page has multiple Review Tour Buttons, this is "myReviews"
+if (reviewTourBtnAllElement.length > 0) {
+  // Get all reviewTourBtn Elements
+  reviewTourBtnAllElement.forEach((editReviewBtnElement) => {
+    // Load tourId and reviewId for each Button element
+    const { tourId, reviewId } = editReviewBtnElement.dataset;
+
+    // get DOM for each modal
+    reviewModalSubmitBtnElement = document.getElementById(
+      `review-modal--submit-${reviewId}`,
+    );
+    // get DOM for each Review TextArea
+    reviewModalReviewElement = document.getElementById(
+      `review-modal-review-${reviewId}`,
+    );
+    // get DOM for each Review Rating
+    reviewModalRatingElement = document.getElementById(
+      `review-modal-rating-${reviewId}`,
+    );
+
+    // Listen for edit Review button
+    editReviewBtnElement.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      // Load tourId and reviewId for the clicked edit Button element
+      const { tourId, reviewId, ratingValue } = editReviewBtnElement.dataset;
+
+      // get DOM for the corresponding modal Review Rating
+      reviewModalElement = document.getElementById(`review-modal-${reviewId}`);
+
+      // get DOM for the corresponding modal Review Rating
+      reviewModalRatingElement = document.getElementById(
+        `review-modal-rating-${reviewId}`,
+      );
+      // set tourId in the corresponding Modal Element DOM
+      reviewModalElement.dataset.tour = tourId;
+      // Show stars in the corresponding modal
+      reviewModalRatingElement.style.setProperty('--value', ratingValue);
+      // show corresponding Modal
+      reviewModalElement.style.display = 'block';
+    });
+
+    // Listen for Review Modal Submit Button
+    reviewModalSubmitBtnElement.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // Load tourId and reviewId for clicked Submit Button
+      const { tourId, reviewId } = e.target.dataset;
+
+      // get DOM for the current modal Review Rating
+      reviewModalElement = document.getElementById(`review-modal-${reviewId}`);
+
+      // get DOM for the current Review TextArea
+      reviewModalReviewElement = document.getElementById(
+        `review-modal-review-${reviewId}`,
+      );
+      // get DOM for the current Review Rating
+      reviewModalRatingElement = document.getElementById(
+        `review-modal-rating-${reviewId}`,
+      );
+
+      // Update the review that was editted in the Modal
+      updateReview({
+        id: reviewId,
+        tour: tourId,
+        rating: reviewModalRatingElement.value,
+        review: reviewModalReviewElement.value,
+      });
+
+      //Unload current modal
+      reviewModalElement.style.display = 'none';
+    });
+
+    // Listen for Rating Stars and reset properties to change stars
+    reviewModalRatingElement.addEventListener('click', function (e) {
+      // send the RatingElement value to the Stars
+      this.style.setProperty('--value', `${this.valueAsNumber}`);
+    });
+  });
+
+  // Listen for clicks outside of the Modal
+  window.onclick = (event) => {
+    if (event.target === reviewModalElement) {
+      //Unload modal
+      reviewModalElement.style.display = 'none';
+    }
+  };
+}
+
+// If there is an alert in the Body, call showAlert for it
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) showAlert('success', alertMessage, 10);
